@@ -155,7 +155,7 @@ in
     };
 
     publish = commonAttrs // {
-      dependsOn = [ test-crypto test-rlp ];
+      dependsOn = [ test-crypto test-rlp test-unit ];
       label = "Publishing libraries to Maven";
       command = ''
         nix-shell --run './publish.sh'
