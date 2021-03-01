@@ -157,7 +157,7 @@ in
     install-gpg = commonAttrs // {
       label = "Install GPG";
       command = ''
-        apt update && apt install -y gnupg2 && mv /usr/bin/gpg /usr/bin/gpg-vanilla && echo '#!/bin/sh\n\n/usr/bin/gpg-vanilla --no-tty --pinentry loopback \$@' > /usr/bin/gpg && chmod 755 /usr/bin/gpg && cat /usr/bin/gpg
+        which gpg; yum install -y gnupg2 && mv /usr/bin/gpg /usr/bin/gpg-vanilla && echo '#!/bin/sh\n\n/usr/bin/gpg-vanilla --no-tty --pinentry loopback \$@' > /usr/bin/gpg && chmod 755 /usr/bin/gpg && cat /usr/bin/gpg
       '';
       branches = "master develop ETCM-165-publish";
     };
@@ -165,7 +165,7 @@ in
     install-base64 = commonAttrs // {
       label = "Install Base64";
       command = ''
-        apt update && apt install -y cl-base64
+        which base64; yum install -y cl-base64
       '';
       branches = "master develo ETCM-165-publishp";
     };
