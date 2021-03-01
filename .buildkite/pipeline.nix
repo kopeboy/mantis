@@ -158,10 +158,10 @@ in
       dependsOn = [ test-crypto test-rlp test-unit ];
       label = "Publishing libraries to Maven";
       command = ''
-        nix-shell --run './publish.sh'
+        nix-shell --run '.buildkite/publish.sh'
       '';
       branches = "master develop ETCM-165-publish";
-      timeoutInMinutes = 60;
+      timeoutInMinutes = 30;
     };
   };
 }
