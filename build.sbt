@@ -12,10 +12,40 @@ val nixBuild = sys.props.isDefinedAt("nix")
 // Enable dev mode: disable certain flags, etc.
 val mantisDev = sys.props.get("mantisDev").contains("true") || sys.env.get("MANTIS_DEV").contains("true")
 
+// Releasing.
+organization := "io.iohk"
+homepage := Some(url("https://github.com/input-output-hk/mantis"))
+scmInfo := Some(ScmInfo(url("https://github.com/input-output-hk/mantis"), "git@github.com:input-output-hk/mantis.git"))
+developers := List()
+licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
+publishMavenStyle := true
+
+// artifact name will include scala version
+crossPaths := true
+
+// Snapshot versions publish to sonatype snapshot repository,
+// other versions publish to sonatype staging repository.
+publishTo := Some(
+  if (isSnapshot.value)
+    Opts.resolver.sonatypeSnapshots
+  else
+    Opts.resolver.sonatypeStaging
+)
+
+// Only publish selected sub-projects.
+publish / skip := true
+
+// Sonatype credentials
+credentials += Credentials(
+    "Sonatype Nexus Repository Manager",
+    "oss.sonatype.org",
+    sys.env.getOrElse("OSS_USERNAME",""),
+    sys.env.getOrElse("OSS_PASSWORD","")
+)
+
 def commonSettings(projectName: String): Seq[sbt.Def.Setting[_]] = Seq(
   name := projectName,
   organization := "io.iohk",
-  version := "3.2.1",
   scalaVersion := "2.13.4",
   // Scalanet snapshots are published to Sonatype after each build.
   resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
@@ -66,6 +96,7 @@ lazy val crypto = {
     .dependsOn(bytes)
     .settings(commonSettings("mantis-crypto"))
     .settings(
+      publish / skip := false,
       libraryDependencies ++=
         Dependencies.akkaUtil ++
           Dependencies.crypto ++
@@ -82,6 +113,7 @@ lazy val rlp = {
     .dependsOn(bytes)
     .settings(commonSettings("mantis-rlp"))
     .settings(
+      publish / skip := false,
       libraryDependencies ++=
         Dependencies.akkaUtil ++
           Dependencies.shapeless ++
@@ -253,6 +285,20 @@ addCommandAlias(
     |;rlp/test
     |;testQuick
     |;it:test
+    |""".stripMargin
+)
+
+addCommandAlias(
+  "publish-all",
+  """;crypto/publishLocal
+    |;rlp/publishLocal
+    |""".stripMargin
+)
+
+addCommandAlias(
+  "release-all",
+  """;crypto/sonatypeRelease
+    |;rlp/sonatypeRelease
     |""".stripMargin
 )
 
